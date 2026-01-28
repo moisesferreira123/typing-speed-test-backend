@@ -16,7 +16,7 @@ datasource db {
 
 model Leaderboard {
   id Int @id @default(autoincrement())
-  user String @unique @db.VarChar(16)
+  user String @db.VarChar(16)
   createdAt DateTime @default(now())
   accuracy Int 
   wpm Int
