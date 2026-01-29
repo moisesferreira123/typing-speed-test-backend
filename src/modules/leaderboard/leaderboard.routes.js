@@ -3,6 +3,7 @@ import { Router } from "express";
 const leaderboardRoutes = Router();
 
 leaderboardRoutes.get('/', getLeaderboard);
-// leaderboardRoutes.post('/', addToRank);
+leaderboardRoutes.get('/:id', getPositionById);
+leaderboardRoutes.post('/', addToRank);
 
 export default leaderboardRoutes;
