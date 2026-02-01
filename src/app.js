@@ -5,7 +5,9 @@ import registerRoutes from './routes/index.js'
 const app = express();
 
 app.use(express.json());
-app.use(cors());
+app.use(cors({
+  origin: 'https://typing-speed-test-main.vercel.app/'
+}));
 
 registerRoutes(app);
 
