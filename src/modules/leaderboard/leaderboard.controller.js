@@ -25,19 +25,17 @@ export async function addToRank(req, res) {
       }
     });
 
-    const total = await prisma.leaderboard.count();
-
-    if(total > 100) {
-      const worst = await prisma.leaderboard.findFirst({
-        orderBy: [{wpm: 'asc'}, {accuracy: 'asc'}, {createdAt: 'desc'}],
-      }); 
-
-      if(worst) {
-        await prisma.leaderboard.delete({
-          where: {id: worst.id}
-        });
-      }
-    }
+    await prisma.$executeRaw`
+      DELETE FROM Leaderboard
+      WHERE id NOT IN (
+        SELECT id FROM (
+          SELECT id
+          FROM Leaderboard
+          ORDER BY wpm DESC, accuracy DESC, createdAt ASC
+          LIMIT 100
+        ) ranked
+      );
+    `;
 
     res.status(201).json(newUser);
   } catch(err) {
@@ -83,5 +81,20 @@ export async function getPositionById(req, res) {
   } catch(err) {
     console.log(`Error retrieving position by ID.: ${err}`);
     res.status(500).json({error: `It was not possible to obtain the user's position by ID.`});
+  }
+}
+
+export async function updateUsernameById(req, res) {
+  const id = Number(req.params.id);
+  const { username } = req.body;
+  try {
+    await prisma.leaderboard.update({
+      where: { id: id },
+      data: { username: username }
+    });
+    res.status(200).json({message: 'Username updated!'})
+  } catch (err) {
+    console.log(`Error updating uername by ID: ${err}`);
+    res.status(500).json({error: `It was not possible to update the username by ID.`});
   }
 }

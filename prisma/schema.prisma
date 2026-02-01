@@ -5,8 +5,8 @@
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
 generator client {
-  provider = "prisma-client-js"
-  // output   = "../generated/prisma"
+  provider = "prisma-client"
+  output   = "./generated"
 }
 
 datasource db {
@@ -16,7 +16,7 @@ datasource db {
 
 model Leaderboard {
   id Int @id @default(autoincrement())
-  user String @db.VarChar(16)
+  username String @db.VarChar(16)
   createdAt DateTime @default(now())
   accuracy Int 
   wpm Int
