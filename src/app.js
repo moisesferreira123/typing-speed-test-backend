@@ -6,7 +6,7 @@ const app = express();
 
 app.use(express.json());
 app.use(cors({
-  origin: 'https://typing-speed-test-main.vercel.app/'
+  origin: 'https://typing-speed-test-main.vercel.app'
 }));
 
 registerRoutes(app);
