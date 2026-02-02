@@ -17,7 +17,7 @@ export async function addToRank(req, res) {
   const { username, accuracy, wpm } = req.body;
 
   try {
-    const newUser = await prisma.leaderboard.create({
+    await prisma.leaderboard.create({
       data: {
         username: username,
         accuracy: parseInt(accuracy),
@@ -37,36 +37,33 @@ export async function addToRank(req, res) {
       );
     `;
 
-    res.status(201).json(newUser);
+    res.status(201).json({message: "The user was successfully registered on the leaderboard."});
   } catch(err) {
     console.log(`Error adding user to leaderboard: ${err}`);
     res.status(500).json({error: 'It was not possible to add the user to the ranking.'});
   }
 }
 
-export async function getPositionById(req, res) {
-  const id = Number(req.params.id);
+export async function getPosition(req, res) {
+  const wpm = Number(req.body.wpm);
+  const accuracy = Number(req.body.accuracy);
+  const createdAt = new Date(req.body.createdAt);
+
   try {
-    const user = await prisma.leaderboard.findUnique({
-      where: {id: id}
-    });
-
-    if(!user) return res.status(200).json({position: null});
-
     const position = await prisma.leaderboard.count({
       where: {
         OR: [
-          {wpm: {gt: user.wpm}},
+          {wpm: {gt: wpm}},
           {
             AND: [
-              {wpm: user.wpm},
+              {wpm: wpm},
               {
                 OR: [
-                  {accuracy: {gt: user.accuracy}},
+                  {accuracy: {gt: accuracy}},
                   {
                     AND: [
-                      {accuracy: user.accuracy},
-                      {createdAt: {lt: user.createdAt}}
+                      {accuracy: accuracy},
+                      {createdAt: {lt: createdAt}}
                     ]
                   }
                 ]
@@ -81,20 +78,5 @@ export async function getPositionById(req, res) {
   } catch(err) {
     console.log(`Error retrieving position by ID.: ${err}`);
     res.status(500).json({error: `It was not possible to obtain the user's position by ID.`});
-  }
-}
-
-export async function updateUsernameById(req, res) {
-  const id = Number(req.params.id);
-  const { username } = req.body;
-  try {
-    await prisma.leaderboard.update({
-      where: { id: id },
-      data: { username: username }
-    });
-    res.status(200).json({message: 'Username updated!'})
-  } catch (err) {
-    console.log(`Error updating uername by ID: ${err}`);
-    res.status(500).json({error: `It was not possible to update the username by ID.`});
   }
 }
